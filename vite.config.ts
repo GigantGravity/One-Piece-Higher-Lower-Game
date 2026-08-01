@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/one-piece-higher-lower/',
+  base: '/One-Piece-Higher-Lower-Game/',
 })
