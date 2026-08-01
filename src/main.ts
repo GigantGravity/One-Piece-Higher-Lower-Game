@@ -3,8 +3,8 @@ import { createInitialState, checkGuess, advanceRound, saveHighscoreIfNeeded, pr
 import './style.css';
 
 let state: GameState = createInitialState();
-preloadImage(state.currentPirate.image);
-preloadImage(state.nextPirate.image);
+preloadImage(resolveImagePath(state.currentPirate.image));
+preloadImage(resolveImagePath(state.nextPirate.image));
 let isGameOver = false;
 let feedback: 'correct' | 'wrong' | null = null;
 let isTransitioning = false;
@@ -16,8 +16,11 @@ function formatBounty(bounty: number): string {
 }
 
 function render(): void {
-  const currentBg = state.currentPirate.image || 'linear-gradient(135deg, #1b2a4a, #0a1128)';
-  const nextBg = state.nextPirate.image || 'linear-gradient(135deg, #1b2a4a, #0a1128)';
+  const currentImagePath = resolveImagePath(state.currentPirate.image);
+  const nextImagePath = resolveImagePath(state.nextPirate.image);
+
+  const currentBg = currentImagePath || 'linear-gradient(135deg, #1b2a4a, #0a1128)';
+  const nextBg = nextImagePath || 'linear-gradient(135deg, #1b2a4a, #0a1128)';
 
   const currentPosition = state.currentPirate.imagePosition || 'center';
   const nextPosition = state.nextPirate.imagePosition || 'center';
@@ -27,7 +30,7 @@ function render(): void {
   app.innerHTML = `
     <div class="game">
       <div class="card card-left" style="background-image: ${
-        state.currentPirate.image ? `url('${state.currentPirate.image}')` : currentBg
+        currentImagePath ? `url('${currentImagePath}')` : currentBg
       }; background-position: ${currentPosition};">
         <div class="card-overlay">
           <h2 class="pirate-name">"${state.currentPirate.name}"</h2>
@@ -39,7 +42,7 @@ function render(): void {
       <div class="vs-badge">VS</div>
 
       <div class="card card-right${feedbackClass}" style="background-image: ${
-        state.nextPirate.image ? `url('${state.nextPirate.image}')` : nextBg
+        nextImagePath ? `url('${nextImagePath}')` : nextBg
       }; background-position: ${nextPosition};">
         <div class="card-overlay">
           <h2 class="pirate-name">"${state.nextPirate.name}"</h2>
@@ -90,8 +93,8 @@ function handleGuess(guess: 'higher' | 'lower'): void {
   setTimeout(() => {
     if (wasCorrect) {
       state = advanceRound(state);
-      preloadImage(state.currentPirate.image);
-      preloadImage(state.nextPirate.image);
+      preloadImage(resolveImagePath(state.currentPirate.image));
+      preloadImage(resolveImagePath(state.nextPirate.image));
     } else {
       state.highscore = saveHighscoreIfNeeded(state.score);
       isGameOver = true;
@@ -124,6 +127,11 @@ function handleKeydown(event: KeyboardEvent): void {
   } else if (event.key === 'ArrowDown') {
     handleGuess('lower');
   }
+}
+
+function resolveImagePath(path: string): string {
+  if (!path) return '';
+  return import.meta.env.BASE_URL + path;
 }
 
 document.addEventListener('keydown', handleKeydown);
