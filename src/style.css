@@ -1,0 +1,178 @@
+:root {
+  --color-gold: #ffd60a;
+  --color-text: #f5f5f5;
+  --color-text-muted: #d0d0d0;
+  --color-wrong: #ff6b6b;
+  --overlay: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0.15) 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: system-ui, sans-serif;
+  color: var(--color-text);
+}
+
+.game {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.card {
+  flex: 1;
+  min-height: 100vh;
+  background-color: #0a1128;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+}
+
+.card-overlay {
+  width: 100%;
+  background: var(--overlay);
+  padding: 40px 32px;
+  text-align: center;
+}
+
+.pirate-name {
+  font-size: 1.8rem;
+  margin: 0 0 8px;
+}
+
+.label {
+  color: var(--color-text-muted);
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+
+.bounty {
+  font-size: 2.6rem;
+  font-weight: bold;
+  color: var(--color-gold);
+  margin: 0 0 8px;
+}
+
+.hint {
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.vs-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.95rem;
+  z-index: 10;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+button {
+  font-size: 1rem;
+  padding: 12px 28px;
+  border-radius: 999px;
+  border: 2px solid var(--color-gold);
+  background: transparent;
+  color: var(--color-text);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  min-width: 220px;
+}
+
+button:hover {
+  background: var(--color-gold);
+  color: #111;
+}
+
+.game-over {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.game-over .result {
+  color: var(--color-wrong);
+  font-weight: bold;
+}
+
+.score {
+  position: absolute;
+  bottom: 20px;
+  font-weight: bold;
+  font-size: 1rem;
+  z-index: 10;
+}
+
+.score-left {
+  left: 20px;
+}
+
+.score-right {
+  right: 20px;
+}
+
+@media (max-width: 700px) {
+  .game {
+    flex-direction: column;
+  }
+
+  .card {
+    min-height: 50vh;
+  }
+
+  .vs-badge {
+    top: 50%;
+  }
+
+  .pirate-name {
+    font-size: 1.3rem;
+  }
+
+  .bounty {
+    font-size: 1.8rem;
+  }
+}
+
+.card.feedback-correct .card-overlay {
+  background: linear-gradient(to top, rgba(46, 204, 113, 0.75) 0%, rgba(46, 204, 113, 0.25) 60%, rgba(0, 0, 0, 0.15) 100%);
+}
+
+.card.feedback-wrong .card-overlay {
+  background: linear-gradient(to top, rgba(231, 76, 60, 0.75) 0%, rgba(231, 76, 60, 0.25) 60%, rgba(0, 0, 0, 0.15) 100%);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background: transparent;
+  color: var(--color-text);
+}

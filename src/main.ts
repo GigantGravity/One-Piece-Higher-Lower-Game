@@ -1,0 +1,130 @@
+import type { GameState } from './types';
+import { createInitialState, checkGuess, advanceRound, saveHighscoreIfNeeded, preloadImage } from './game';
+import './style.css';
+
+let state: GameState = createInitialState();
+preloadImage(state.currentPirate.image);
+preloadImage(state.nextPirate.image);
+let isGameOver = false;
+let feedback: 'correct' | 'wrong' | null = null;
+let isTransitioning = false;
+
+const app = document.querySelector<HTMLDivElement>('#app')!;
+
+function formatBounty(bounty: number): string {
+  return bounty.toLocaleString('de-DE') + ' Berry';
+}
+
+function render(): void {
+  const currentBg = state.currentPirate.image || 'linear-gradient(135deg, #1b2a4a, #0a1128)';
+  const nextBg = state.nextPirate.image || 'linear-gradient(135deg, #1b2a4a, #0a1128)';
+
+  const currentPosition = state.currentPirate.imagePosition || 'center';
+  const nextPosition = state.nextPirate.imagePosition || 'center';
+
+  const feedbackClass = feedback ? ` feedback-${feedback}` : '';
+
+  app.innerHTML = `
+    <div class="game">
+      <div class="card card-left" style="background-image: ${
+        state.currentPirate.image ? `url('${state.currentPirate.image}')` : currentBg
+      }; background-position: ${currentPosition};">
+        <div class="card-overlay">
+          <h2 class="pirate-name">"${state.currentPirate.name}"</h2>
+          <p class="label">hat ein Kopfgeld von</p>
+          <p class="bounty">${formatBounty(state.currentPirate.bounty)}</p>
+        </div>
+      </div>
+
+      <div class="vs-badge">VS</div>
+
+      <div class="card card-right${feedbackClass}" style="background-image: ${
+        state.nextPirate.image ? `url('${state.nextPirate.image}')` : nextBg
+      }; background-position: ${nextPosition};">
+        <div class="card-overlay">
+          <h2 class="pirate-name">"${state.nextPirate.name}"</h2>
+          <p class="label">hat ein</p>
+          ${
+            isGameOver
+              ? `<div class="game-over">
+                   <p class="result">Game Over! ${state.score} Punkte.</p>
+                   <button id="restart-btn">Nochmal spielen</button>
+                 </div>`
+              : `<div class="controls">
+                   <button id="higher-btn" ${isTransitioning ? 'disabled' : ''}>Höheres Kopfgeld ▲</button>
+                   <button id="lower-btn" ${isTransitioning ? 'disabled' : ''}>Niedrigeres Kopfgeld ▼</button>
+                 </div>`
+          }
+          <p class="hint">Kopfgeld als ${state.currentPirate.name}</p>
+        </div>
+      </div>
+
+      <div class="score score-left">High Score: ${state.highscore}</div>
+      <div class="score score-right">Score: ${state.score}</div>
+    </div>
+  `;
+
+  attachEventListeners();
+}
+
+function attachEventListeners(): void {
+  if (isGameOver) {
+    const restartBtn = document.querySelector<HTMLButtonElement>('#restart-btn');
+    restartBtn?.addEventListener('click', handleRestart);
+  } else {
+    const higherBtn = document.querySelector<HTMLButtonElement>('#higher-btn');
+    const lowerBtn = document.querySelector<HTMLButtonElement>('#lower-btn');
+    higherBtn?.addEventListener('click', () => handleGuess('higher'));
+    lowerBtn?.addEventListener('click', () => handleGuess('lower'));
+  }
+}
+
+function handleGuess(guess: 'higher' | 'lower'): void {
+  if (isTransitioning) return;
+
+  const wasCorrect = checkGuess(state, guess);
+  feedback = wasCorrect ? 'correct' : 'wrong';
+  isTransitioning = true;
+  render();
+
+  setTimeout(() => {
+    if (wasCorrect) {
+      state = advanceRound(state);
+      preloadImage(state.currentPirate.image);
+      preloadImage(state.nextPirate.image);
+    } else {
+      state.highscore = saveHighscoreIfNeeded(state.score);
+      isGameOver = true;
+    }
+
+    feedback = null;
+    isTransitioning = false;
+    render();
+  }, 800);
+}
+
+function handleRestart(): void {
+  state = createInitialState();
+  isGameOver = false;
+  render();
+}
+
+function handleKeydown(event: KeyboardEvent): void {
+  if (isGameOver) {
+    if (event.key === 'Enter') {
+      handleRestart();
+    }
+    return;
+  }
+
+  if (isTransitioning) return;
+
+  if (event.key === 'ArrowUp') {
+    handleGuess('higher');
+  } else if (event.key === 'ArrowDown') {
+    handleGuess('lower');
+  }
+}
+
+document.addEventListener('keydown', handleKeydown);
+render();
