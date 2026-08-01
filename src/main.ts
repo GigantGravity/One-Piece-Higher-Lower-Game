@@ -6,6 +6,7 @@ let state: GameState = createInitialState();
 let isGameOver = false;
 let feedback: 'correct' | 'wrong' | null = null;
 let isTransitioning = false;
+let justAdvanced = false;
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
@@ -31,6 +32,7 @@ function formatBounty(bounty: number): string {
 }
 
 function render(): void {
+  console.log('render() aufgerufen, justAdvanced:', justAdvanced);
   const currentImagePath = resolveImagePath(state.currentPirate.image);
   const nextImagePath = resolveImagePath(state.nextPirate.image);
 
@@ -44,9 +46,9 @@ function render(): void {
 
   app.innerHTML = `
     <div class="game">
-      <div class="card card-left" style="background-image: ${
-        currentImagePath ? `url('${currentImagePath}')` : currentBg
-      }; background-position: ${currentPosition};">
+      <div class="card card-left" style="view-transition-name: pirate-${slugify(state.currentPirate.name)}; 
+      background-image: ${currentImagePath ? `url('${currentImagePath}')` : currentBg
+    }; background-position: ${currentPosition};">
         <div class="card-overlay">
           <h2 class="pirate-name">"${state.currentPirate.name}"</h2>
           <p class="label">hat ein Kopfgeld von</p>
@@ -56,9 +58,9 @@ function render(): void {
 
       <div class="vs-badge">VS</div>
 
-      <div class="card card-right${feedbackClass}" style="background-image: ${
-        nextImagePath ? `url('${nextImagePath}')` : nextBg
-      }; background-position: ${nextPosition};">
+      <div class="card card-right${feedbackClass}" style="view-transition-name: pirate-${slugify(state.nextPirate.name)}; 
+      background-image: ${nextImagePath ? `url('${nextImagePath}')` : nextBg
+    }; background-position: ${nextPosition};">
         <div class="card-overlay">
           <h2 class="pirate-name">"${state.nextPirate.name}"</h2>
           <p class="label">hat ein</p>
@@ -105,7 +107,8 @@ function handleGuess(guess: 'higher' | 'lower'): void {
   isTransitioning = true;
   render();
 
-  setTimeout(() => {
+setTimeout(() => {
+  const updateAndRender = () => {
     if (wasCorrect) {
       state = advanceRound(state);
       preloadImage(resolveImagePath(state.currentPirate.image));
@@ -118,7 +121,14 @@ function handleGuess(guess: 'higher' | 'lower'): void {
     feedback = null;
     isTransitioning = false;
     render();
-  }, 800);
+  };
+
+  if (document.startViewTransition) {
+    document.startViewTransition(updateAndRender);
+  } else {
+    updateAndRender();
+  }
+}, 800);
 }
 
 function handleRestart(): void {
@@ -142,4 +152,8 @@ function handleKeydown(event: KeyboardEvent): void {
   } else if (event.key === 'ArrowDown') {
     handleGuess('lower');
   }
+}
+
+function slugify(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
