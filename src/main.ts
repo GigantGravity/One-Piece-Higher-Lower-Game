@@ -1,15 +1,30 @@
 import type { GameState } from './types';
-import { createInitialState, checkGuess, advanceRound, saveHighscoreIfNeeded, preloadImage } from './game';
+import { createInitialState, checkGuess, advanceRound, saveHighscoreIfNeeded, preloadImage, preloadAllImages, resolveImagePath } from './game';
 import './style.css';
 
 let state: GameState = createInitialState();
-preloadImage(resolveImagePath(state.currentPirate.image));
-preloadImage(resolveImagePath(state.nextPirate.image));
 let isGameOver = false;
 let feedback: 'correct' | 'wrong' | null = null;
 let isTransitioning = false;
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
+
+function showLoadingScreen(): void {
+  app.innerHTML = `
+    <div class="loading-screen">
+      <p>Piraten werden geladen ...</p>
+    </div>
+  `;
+}
+
+async function init(): Promise<void> {
+  showLoadingScreen();
+  await preloadAllImages();
+  document.addEventListener('keydown', handleKeydown);
+  render();
+}
+
+init();
 
 function formatBounty(bounty: number): string {
   return bounty.toLocaleString('de-DE') + ' Berry';
@@ -128,11 +143,3 @@ function handleKeydown(event: KeyboardEvent): void {
     handleGuess('lower');
   }
 }
-
-function resolveImagePath(path: string): string {
-  if (!path) return '';
-  return import.meta.env.BASE_URL + path;
-}
-
-document.addEventListener('keydown', handleKeydown);
-render();

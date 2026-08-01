@@ -11,6 +11,30 @@ function addToHistory(name: string): void {
   }
 }
 
+export function resolveImagePath(path: string): string {
+  if (!path) return '';
+  return import.meta.env.BASE_URL + path;
+}
+
+export function preloadAllImages(): Promise<void[]> {
+  const withImages = pirates.filter((pirate) => pirate.image);
+  console.log(`Preloading ${withImages.length} von ${pirates.length} Piraten-Bildern`);
+
+  const promises = withImages.map((pirate) => {
+    return new Promise<void>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => {
+        console.warn(`Bild konnte nicht geladen werden: ${pirate.name} (${pirate.image})`);
+        resolve();
+      };
+      img.src = resolveImagePath(pirate.image);
+    });
+  });
+
+  return Promise.all(promises);
+}
+
 export function getRandomPirate(exclude?: Pirate): Pirate {
   if (pirates.length < 2) {
     throw new Error('Es werden mindestens 2 Piraten benötigt, um das Spiel zu spielen.');
