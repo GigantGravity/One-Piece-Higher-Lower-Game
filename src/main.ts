@@ -16,7 +16,6 @@ import {
   declineFriendRequest,
 } from './api';
 import { t, getLanguage, setLanguage } from './i18n';
-import type { Language } from './i18n';
 import './style.css';
 
 let state: GameState = createInitialState();
