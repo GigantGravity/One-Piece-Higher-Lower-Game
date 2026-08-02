@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: higher-lower-db
+    environment:
+      POSTGRES_DB: higher_lower
+      POSTGRES_USER: higher_lower_user
+      POSTGRES_PASSWORD: dev_password_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
