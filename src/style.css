@@ -161,10 +161,6 @@ button:hover {
     flex-direction: column;
   }
 
-  .card {
-    min-height: 50vh;
-  }
-
   .vs-badge {
     top: 50%;
   }
@@ -175,6 +171,30 @@ button:hover {
 
   .bounty {
     font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .main-nav {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .nav-logo {
+    height: 28px;
+  }
+
+  .nav-link span {
+    display: none;
+  }
+
+  .nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .user-info {
+    display: none;
   }
 }
 
