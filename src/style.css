@@ -809,3 +809,7 @@ button:disabled:hover {
     height: 32px;
   }
 }
+
+.bounty.revealed {
+  color: var(--color-wrong, #ff6b6b);
+}

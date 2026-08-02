@@ -75,7 +75,7 @@ function renderGame(): void {
 
   const feedbackClass = feedback ? ` feedback-${feedback}` : '';
 
-app.innerHTML = `
+  app.innerHTML = `
   <div class="game">
     ${renderNav()}
 
@@ -100,7 +100,8 @@ app.innerHTML = `
           <p class="label">${t('game.has')}</p>
           ${
             isGameOver
-              ? `<div class="game-over">
+              ? `<p class="bounty revealed">${formatBounty(state.nextPirate.bounty)}</p>
+                 <div class="game-over">
                    <p class="result">${t('game.gameOver')} ${state.score} ${t('game.points')}</p>
                    <button id="restart-btn">${t('game.playAgain')}</button>
                  </div>`
@@ -119,7 +120,6 @@ app.innerHTML = `
   </div>
 `;
 
-  attachEventListeners();
   attachEventListeners();
   attachNavListeners();
 }
