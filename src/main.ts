@@ -512,6 +512,7 @@ function renderFriends(): void {
 }
 
 async function loadFriendsData(): Promise<void> {
+  friendActionError = null;
   isFriendsLoading = true;
   render();
 

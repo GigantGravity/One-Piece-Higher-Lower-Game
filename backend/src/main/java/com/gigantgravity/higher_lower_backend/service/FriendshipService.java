@@ -11,17 +11,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class FriendshipService {
 
     private final FriendshipRepository friendshipRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public void sendRequest(UUID requesterId, String addresseeUsername) {
         User requester = userRepository.findById(requesterId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nutzer nicht gefunden"));
@@ -47,12 +50,14 @@ public class FriendshipService {
         friendshipRepository.save(friendship);
     }
 
+    @Transactional
     public void acceptRequest(UUID currentUserId, UUID friendshipId) {
         Friendship friendship = getOwnedPendingRequest(currentUserId, friendshipId);
         friendship.setStatus(FriendshipStatus.ACCEPTED);
         friendshipRepository.save(friendship);
     }
 
+    @Transactional
     public void declineRequest(UUID currentUserId, UUID friendshipId) {
         Friendship friendship = getOwnedPendingRequest(currentUserId, friendshipId);
         friendship.setStatus(FriendshipStatus.DECLINED);
